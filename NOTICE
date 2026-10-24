@@ -1,0 +1,16 @@
+promboard.trellis2
+Copyright 2026 PromBoard
+
+This plugin is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+It runs trellis.cpp (https://github.com/pwilkin/trellis.cpp, MIT License), a C++/GGML port of
+Microsoft TRELLIS.2 (https://github.com/microsoft/TRELLIS.2, MIT License). The trellis.cpp release
+binaries (v0.8.1) and the GGUF weights are not included in this plugin; they are downloaded at prepare
+time from the trellis.cpp GitHub release and from ilintar/trellis2-gguf and vegax87/Pixal3D on Hugging Face,
+each pinned by sha256.
+
+Third-party models used by the downloaded weights:
+- TRELLIS.2-4B (Microsoft) - MIT License
+- Pixal3D (TencentARC) - MIT License
+- DINOv3 ViT-L/16 (Meta) - DINOv3 License, https://github.com/facebookresearch/dinov3/blob/main/LICENSE.md
+- BiRefNet (ZhengPeng7) - MIT License

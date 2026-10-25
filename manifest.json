@@ -1,9 +1,9 @@
 {
   "schema": 1,
   "id": "promboard.trellis2",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "name": "TRELLIS.2 — 이미지 → 재질 입힌 3D",
-  "description": "Microsoft TRELLIS.2(4B)로 물체 사진 한 장에서 PBR 재질(색 · 거칠기 · 금속성 · 투명도)이 입혀진 GLB 3D 모델을 만든다. 후속판 Pixal3D 도 고를 수 있다. 윈도우 전용 — trellis.cpp(C++ 실행 파일, MIT)를 GitHub 릴리스에서, GGUF 가중치를 Hugging Face 에서 받아 파이썬 · CUDA 컴파일 없이 돈다. NVIDIA 는 CUDA, AMD · 인텔은 Vulkan. 경량화(원본 f16 · GGUF Q8 · Q4)는 자동이면 그래픽카드 메모리로 고른다.",
+  "description": "Microsoft TRELLIS.2(4B)로 물체 사진 한 장에서 PBR 재질(색 · 거칠기 · 금속성 · 투명도)이 입혀진 GLB 3D 모델을 만든다. 후속판 Pixal3D 도 고를 수 있다. 윈도우 전용 — trellis.cpp 릴리스의 실행 파일(trellis-cli, sha256 고정, MIT)을 GitHub 에서, GGUF 가중치를 Hugging Face 에서 받아 파이썬 · CUDA 컴파일 없이 돈다. 앱이 플러그인에 거는 인터넷 차단은 이 실행 파일에는 걸리지 않는다. NVIDIA 는 CUDA, AMD · 인텔은 Vulkan. 경량화(원본 f16 · GGUF Q8 · Q4)는 자동이면 그래픽카드 메모리로 고른다.",
   "author": "PromBoard",
   "license": "Apache-2.0",
   "app": ">=1.0.3",
@@ -43,7 +43,7 @@
         {
           "id": "model",
           "label": "판",
-          "help": "TRELLIS.2 가 기본입니다. Pixal3D 는 그림의 모양을 더 따르는 TRELLIS.2 후속판이고 f16 하나뿐이라 무겁습니다(경량화 칸을 보지 않습니다). 고른 판만 받습니다.",
+          "help": "TRELLIS.2 가 기본입니다. Pixal3D 는 그림의 모양을 더 따르는 TRELLIS.2 후속판이고 f16 하나뿐이라 무겁습니다. 경량화 칸은 보지 않지만 경량화에서 고른 TRELLIS.2 파일도 받으니, Pixal3D 만 쓰면 경량화를 GGUF Q4 로 두세요.",
           "type": "select",
           "options": [
             {
@@ -83,7 +83,8 @@
             },
             {
               "value": "q8",
-              "label": "GGUF Q8"
+              "label": "GGUF Q8",
+              "vramMinMb": 8192
             },
             {
               "value": "q4",

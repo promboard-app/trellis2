@@ -29,7 +29,9 @@ PromBoard 커뮤니티 플러그인입니다. 캔버스에 **TRELLIS.2 이미지
 | 엔진 NVIDIA (CUDA 12) | 0.6GB |
 | 엔진 AMD · 인텔 (Vulkan) | 14MB |
 
-고른 판 · 엔진만 받습니다. 경량화 '자동'은 이 PC 그래픽카드 메모리가 16GB 이상이면 원본(f16), 그 밖에는 GGUF Q4 를 고릅니다(16GB 는 trellis.cpp 문서의 '1024 해상도가 16GB 카드에서 돈다'를 따른 값입니다). Pixal3D 는 f16 하나뿐이라 경량화를 보지 않지만, 실행할 때 고른 경량화 판의 TRELLIS.2 파일도 있어야 합니다(실행 준비가 처음 값으로 받아 둡니다). 가중치는 Hugging Face [ilintar/trellis2-gguf](https://huggingface.co/ilintar/trellis2-gguf) · [vegax87/Pixal3D](https://huggingface.co/vegax87/Pixal3D), 실행 파일은 [trellis.cpp v0.8.1 릴리스](https://github.com/pwilkin/trellis.cpp/releases/tag/v0.8.1)에서 sha256 을 확인하며 받습니다. 플러그인 zip 에는 들어 있지 않습니다.
+고른 판 · 엔진만 받습니다. 경량화 '자동'은 이 PC 그래픽카드 메모리가 16GB 이상이면 원본(f16), 그 밖에는 GGUF Q4 를 고릅니다(16GB 는 trellis.cpp 문서의 '1024 해상도가 16GB 카드에서 돈다'를 따른 값입니다). Pixal3D 는 f16 하나뿐이라 경량화를 보지 않지만, 앱이 받을 파일을 설정 하나로만 고를 수 있어 경량화에서 고른 TRELLIS.2 파일도 함께 받습니다(GGUF Q4 6.5GB · Q8 10.0GB · 원본이면 12.9GB 더). Pixal3D 만 쓰려면 경량화를 GGUF Q4 로 두면 가장 적게 받습니다. 가중치는 Hugging Face [ilintar/trellis2-gguf](https://huggingface.co/ilintar/trellis2-gguf) · [vegax87/Pixal3D](https://huggingface.co/vegax87/Pixal3D), 실행 파일은 [trellis.cpp v0.8.1 릴리스](https://github.com/pwilkin/trellis.cpp/releases/tag/v0.8.1)에서 sha256 을 확인하며 받습니다. 플러그인 zip 에는 들어 있지 않습니다.
+
+필요 그래픽카드 메모리: GGUF Q4 4GB(아래 실측 최대 3.4GB) · GGUF Q8 8GB(어림값 — Q4 실측에 Q8 이 더 받는 가중치 3.5GB 를 다 더한 값) · 원본 f16 16GB(trellis.cpp 문서).
 
 ## 그래픽카드 메모리 · 걸린 시간 (실측)
 
@@ -47,6 +49,7 @@ RTX 4070 SUPER 12GB · Windows 11, 경량화 GGUF Q4 · 엔진 CUDA 13 · 해상
 ## 알아 둘 것
 
 - **윈도우 전용**입니다. trellis.cpp 의 리눅스 실행 파일도 있지만 시험하지 않아 넣지 않았고, 맥 판은 없습니다.
+- trellis.cpp 릴리스의 실행 파일(trellis-cli, sha256 고정)을 받아 실행합니다. 앱이 플러그인에 거는 인터넷 차단은 이 실행 파일에는 걸리지 않습니다.
 - CUDA 13 엔진은 NVIDIA 드라이버 580 이상이 있어야 합니다. 그보다 옛 드라이버는 CUDA 12 엔진(527.41 이상)을 고릅니다.
 - 배경은 투명 PNG 면 그 투명도를 쓰고, 아니면 trellis.cpp 가 BiRefNet 으로 지웁니다.
 - 면 수는 trellis.cpp 기본을 따릅니다(해상도 512 → 15만, 1024 이상 → 30만, quadric 줄이기). 면 수를 정하는 옵션이 trellis.cpp 에 없습니다.
@@ -117,7 +120,9 @@ All results come from running this repository's `nodes/main.py` (1.0.0) inside t
 | Engine NVIDIA (CUDA 12) | 0.6 GB |
 | Engine AMD · Intel (Vulkan) | 14 MB |
 
-With quantization on auto (경량화 · 자동) the app picks the original f16 weights when the GPU has 16 GB or more and GGUF Q4 otherwise (16 GB follows the trellis.cpp docs: the 1024 cascade runs on a 16 GB card). Pixal3D has only f16 and ignores the quantization choice, but a run still needs the TRELLIS.2 files of the chosen quantization (prepare downloads them with the default). Only the chosen model and engine are downloaded, pinned by sha256: weights from Hugging Face ([ilintar/trellis2-gguf](https://huggingface.co/ilintar/trellis2-gguf), [vegax87/Pixal3D](https://huggingface.co/vegax87/Pixal3D)) and the executables from the [trellis.cpp v0.8.1 release](https://github.com/pwilkin/trellis.cpp/releases/tag/v0.8.1). None of them are in the plugin zip.
+With quantization on auto (경량화 · 자동) the app picks the original f16 weights when the GPU has 16 GB or more and GGUF Q4 otherwise (16 GB follows the trellis.cpp docs: the 1024 cascade runs on a 16 GB card). Pixal3D has only f16 and ignores the quantization choice, but the app picks files to download from one setting at a time, so it also downloads the TRELLIS.2 files of the chosen quantization (GGUF Q4 6.5 GB, Q8 10.0 GB, or 12.9 GB more with the original). If you only use Pixal3D, set quantization to GGUF Q4 to download the least. Only the chosen model and engine are downloaded, pinned by sha256: weights from Hugging Face ([ilintar/trellis2-gguf](https://huggingface.co/ilintar/trellis2-gguf), [vegax87/Pixal3D](https://huggingface.co/vegax87/Pixal3D)) and the executables from the [trellis.cpp v0.8.1 release](https://github.com/pwilkin/trellis.cpp/releases/tag/v0.8.1). None of them are in the plugin zip.
+
+GPU memory needed: GGUF Q4 4 GB (3.4 GB peak measured below), GGUF Q8 8 GB (estimate: the Q4 measurement plus all 3.5 GB of extra Q8 weights), original f16 16 GB (trellis.cpp docs).
 
 ### GPU memory and time (measured)
 
@@ -126,6 +131,7 @@ RTX 4070 SUPER 12 GB · Windows 11, GGUF Q4 · CUDA 13 · resolution 1024: peak 
 ### Notes
 
 - **Windows only.** trellis.cpp also ships Linux binaries, but they were not tested so they are not wired in; there is no macOS build.
+- The plugin downloads and runs the executable from the trellis.cpp release (trellis-cli, pinned by sha256). The internet block the app puts on plugins does not apply to this executable.
 - The CUDA 13 engine needs NVIDIA driver 580 or newer; older drivers should pick the CUDA 12 engine (527.41 or newer).
 - A transparent PNG keeps its alpha; otherwise trellis.cpp removes the background with BiRefNet.
 - Face count follows the trellis.cpp default (150K at resolution 512, 300K at 1024 and above, quadric simplification); trellis.cpp has no face-count option.

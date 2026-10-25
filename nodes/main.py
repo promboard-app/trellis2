@@ -32,13 +32,13 @@ PIXAL_REPO = "vegax87/Pixal3D"
 BASE_FILES = ["birefnet.gguf", "dinov3.gguf", "ss_dec.gguf", "shape_dec.gguf", "tex_dec.gguf"]
 FLOW_FILES = ["ss_flow.gguf", "shape_flow_512.gguf", "shape_flow_1024.gguf", "tex_flow_512.gguf", "tex_flow_1024.gguf"]
 PIXAL_FILES = ["pixal3d_naf.gguf", "pixal3d_ss_flow.gguf", "pixal3d_shape_flow_512.gguf", "pixal3d_shape_flow_1024.gguf", "pixal3d_tex_flow_1024.gguf"]
-# 판 → GGUF 폴더(저장소 안 경로 앞부분)
-PRECISION_DIR = {"trellis2-q4": "q4/", "trellis2-q8": "q8/", "trellis2-f16": "", "pixal3d": ""}
+# 경량화 판 → GGUF 폴더(저장소 안 경로 앞부분). Pixal3D 는 f16 하나뿐이라 경량화를 보지 않는다.
+QUANT_DIR = {"f16": "", "q8": "q8/", "q4": "q4/"}
 
 STEP_RE = re.compile(r"^\[(\d+)/(\d+)\]")
 OOM_RE = re.compile(r"out of memory|ErrorOutOfDeviceMemory|cudaMalloc|failed to allocate|allocation failed|bad_alloc", re.I)
 OOM_HELP = (
-    "그래픽카드 메모리가 모자랍니다. '해상도'를 512 로 낮추거나, 판을 'TRELLIS.2 · q4' 로 바꾸거나, "
+    "그래픽카드 메모리가 모자랍니다. '해상도'를 512 로 낮추거나, 판을 TRELLIS.2 로, 경량화를 'GGUF Q4' 로 바꾸거나, "
     "다른 프로그램이 그래픽카드를 쓰고 있으면 닫아 주세요."
 )
 
@@ -77,11 +77,10 @@ def _find_cli(folder: str) -> str:
     raise ValueError("받은 trellis.cpp 묶음에서 trellis-cli.exe 를 찾지 못했습니다.")
 
 
-def _models_dir(ctx, model: str) -> str:
-    """trellis-cli --models 폴더. TRELLIS.2 는 받은 저장소 폴더 그대로, Pixal3D 는 공용 파일과 Pixal3D 파일을 한 폴더에 모은다."""
-    prefix = PRECISION_DIR[model]
+def _models_dir(ctx, model: str, quant: str) -> str:
+    """trellis-cli --models 폴더. TRELLIS.2 는 받은 저장소의 경량화 판 폴더 그대로, Pixal3D 는 공용 f16 파일과 Pixal3D 파일을 한 폴더에 모은다."""
     if model != "pixal3d":
-        return os.path.dirname(ctx.model_path(f"{GGUF_REPO}/{prefix}ss_flow.gguf"))
+        return os.path.dirname(ctx.model_path(f"{GGUF_REPO}/{QUANT_DIR[quant]}ss_flow.gguf"))
     if not ctx.cache_dir:
         raise ValueError("Pixal3D 는 모델 파일을 한 폴더에 모을 캐시 폴더가 필요합니다. 로컬 AI 모델 폴더를 확인해 주세요.")
     merged = os.path.join(ctx.cache_dir, "pixal3d-models")
@@ -113,6 +112,7 @@ def _input_png(path: str, dst: str) -> None:
 
 def image_to_3d(ctx, inputs, settings):
     model = str(settings["model"])
+    quant = str(settings["quantization"])  # 서버가 '자동'을 이 PC 판으로 풀어 보낸다
     engine = str(settings["engine"])
     res = int(settings["resolution"])
     seed = int(settings["seed"])
@@ -124,7 +124,7 @@ def image_to_3d(ctx, inputs, settings):
     zip_path = ctx.model_path(ENGINES[engine])
     run_dir = _extract(zip_path, os.path.join(ctx.cache_dir, f"trellis-{RELEASE}-{engine}"), ctx)
     cli = _find_cli(run_dir)
-    models_dir = _models_dir(ctx, model)
+    models_dir = _models_dir(ctx, model, quant)
 
     src = ctx.in_path(inputs["image"])
     in_png = ctx.out_path("input.png")

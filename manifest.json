@@ -1,12 +1,15 @@
 {
   "schema": 1,
   "id": "promboard.trellis2",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "TRELLIS.2 — 이미지 → 재질 입힌 3D",
-  "description": "Microsoft TRELLIS.2(4B)로 물체 사진 한 장에서 PBR 재질(색 · 거칠기 · 금속성 · 투명도)이 입혀진 GLB 3D 모델을 만든다. 후속판 Pixal3D 도 고를 수 있다. 윈도우 전용 — trellis.cpp(C++ 실행 파일, MIT)를 GitHub 릴리스에서, GGUF 가중치를 Hugging Face 에서 받아 파이썬 · CUDA 컴파일 없이 돈다. NVIDIA 는 CUDA, AMD · 인텔은 Vulkan. 12GB 그래픽카드는 q4 판이 기본이다.",
+  "description": "Microsoft TRELLIS.2(4B)로 물체 사진 한 장에서 PBR 재질(색 · 거칠기 · 금속성 · 투명도)이 입혀진 GLB 3D 모델을 만든다. 후속판 Pixal3D 도 고를 수 있다. 윈도우 전용 — trellis.cpp(C++ 실행 파일, MIT)를 GitHub 릴리스에서, GGUF 가중치를 Hugging Face 에서 받아 파이썬 · CUDA 컴파일 없이 돈다. NVIDIA 는 CUDA, AMD · 인텔은 Vulkan. 경량화(원본 f16 · GGUF Q8 · Q4)는 자동이면 그래픽카드 메모리로 고른다.",
   "author": "PromBoard",
   "license": "Apache-2.0",
-  "app": ">=1.0.1",
+  "app": ">=1.0.3",
+  "categories": [
+    "model3d"
+  ],
   "repository": "https://github.com/promboard-app/trellis2",
   "icon": "icon.png",
   "contents": [
@@ -40,27 +43,55 @@
         {
           "id": "model",
           "label": "판",
-          "help": "TRELLIS.2 q4 가 가장 가볍고(12GB 그래픽카드 기본) q8 · f16 은 조금 더 정확합니다. Pixal3D 는 그림의 모양을 더 따르는 TRELLIS.2 후속판이고 f16 뿐이라 무겁습니다. 고른 판만 받습니다.",
+          "help": "TRELLIS.2 가 기본입니다. Pixal3D 는 그림의 모양을 더 따르는 TRELLIS.2 후속판이고 f16 하나뿐이라 무겁습니다(경량화 칸을 보지 않습니다). 고른 판만 받습니다.",
           "type": "select",
           "options": [
             {
-              "value": "trellis2-q4",
-              "label": "TRELLIS.2 · q4 (6.5GB)"
-            },
-            {
-              "value": "trellis2-q8",
-              "label": "TRELLIS.2 · q8 (10.0GB)"
-            },
-            {
-              "value": "trellis2-f16",
-              "label": "TRELLIS.2 · f16 (16.5GB)"
+              "value": "trellis2",
+              "label": "TRELLIS.2"
             },
             {
               "value": "pixal3d",
-              "label": "Pixal3D · f16 (14.5GB)"
+              "label": "Pixal3D · f16"
             }
           ],
-          "default": "trellis2-q4"
+          "default": "trellis2"
+        },
+        {
+          "id": "quantization",
+          "label": "경량화",
+          "help": "TRELLIS.2 가중치 판. 자동은 그래픽카드 메모리 16GB 이상이면 원본(f16), 그 밖에는 GGUF Q4 를 고릅니다. Q8 · Q4 는 더 가볍고 결과가 조금 덜 정확할 수 있습니다. 고른 판만 받습니다.",
+          "type": "select",
+          "options": [
+            {
+              "value": "auto",
+              "label": "자동",
+              "auto": [
+                {
+                  "minVramMb": 16384,
+                  "value": "f16"
+                },
+                {
+                  "value": "q4"
+                }
+              ]
+            },
+            {
+              "value": "f16",
+              "label": "원본 (f16)",
+              "vramMinMb": 16384
+            },
+            {
+              "value": "q8",
+              "label": "GGUF Q8"
+            },
+            {
+              "value": "q4",
+              "label": "GGUF Q4",
+              "vramMinMb": 4096
+            }
+          ],
+          "default": "auto"
         },
         {
           "id": "engine",
@@ -145,56 +176,56 @@
         "license": "MIT",
         "files": [
           {
-            "path": "q4/birefnet.gguf",
+            "path": "birefnet.gguf",
             "bytes": 882749024,
             "sha256": "10c5dd4dcac904cf81c9a16180eb66f167dd52ab55867f54a44567b0b2babbc1"
           },
           {
-            "path": "q4/ss_dec.gguf",
+            "path": "ss_dec.gguf",
             "bytes": 147379392,
             "sha256": "2790b5eecb261cc877d9bf175ce2bd6dd48cd65be8c042c5f5bc023dfca01cf7"
           },
           {
-            "path": "q4/shape_dec.gguf",
-            "bytes": 845423552,
-            "sha256": "79a52ddfed3454f724683940c11cfbfcf76c427ab3b7fdeb4c3cfc6d26647de4"
+            "path": "shape_dec.gguf",
+            "bytes": 948745344,
+            "sha256": "d3230b649031b55728da2d8818f092eab9ad6f1e72fd01f6cbff6bfada5d7d47"
           },
           {
-            "path": "q4/tex_dec.gguf",
-            "bytes": 845414272,
-            "sha256": "20b208e402db907c6800dd4ad486a0d6e927e4511a6ff87fb51049794988927b"
+            "path": "tex_dec.gguf",
+            "bytes": 948713888,
+            "sha256": "858d1e0079254e1d1f0596d7fa3a747d21bfe80f83d810e735a1e0b9db550322"
           },
           {
-            "path": "q4/ss_flow.gguf",
-            "bytes": 730496672,
-            "sha256": "a43c6393ee4a763a03e382de750d4f62752bacf969940442fd856230e62b88c2"
+            "path": "ss_flow.gguf",
+            "bytes": 2586488480,
+            "sha256": "1dfbef1b80ddea422a6189ff9ac29a244c4482cfbaa01870a0c0ea76d3fb9ae6"
           },
           {
-            "path": "q4/shape_flow_512.gguf",
-            "bytes": 730520576,
-            "sha256": "de7b87a92280035258c94314258e3b8314de39e5f001eac1ada0b4087785fb63"
+            "path": "shape_flow_512.gguf",
+            "bytes": 2586636032,
+            "sha256": "fef397f3600e2fab327a98b3edd3cc8377e9741eef870f3ea3f40235875828fb"
           },
           {
-            "path": "q4/shape_flow_1024.gguf",
-            "bytes": 730520576,
-            "sha256": "54e49e3408b9f77bdc85c3f5a400a58a1d9fc091e111986eda7caeaea621b305"
+            "path": "shape_flow_1024.gguf",
+            "bytes": 2586636032,
+            "sha256": "7d0e9903bf132a5d78f289eaa2fa4050bcd52c689716406cbf66b76cdfa4656c"
           },
           {
-            "path": "q4/tex_flow_512.gguf",
-            "bytes": 730548224,
-            "sha256": "fff7bca6418ad607b8b9ff24034ff63f591d0a9b72f308960bffd6f5cd17390b"
+            "path": "tex_flow_512.gguf",
+            "bytes": 2586734336,
+            "sha256": "0e81b8213191369dc023eb270650f0ccded29f39bf0bbb7a1fe5d4bcefc15b79"
           },
           {
-            "path": "q4/tex_flow_1024.gguf",
-            "bytes": 730548224,
-            "sha256": "028d3be82075f8a4d8b4bd08985e1215ac3783ed332dbf7e8fd6535fcdd3d5a8"
+            "path": "tex_flow_1024.gguf",
+            "bytes": 2586734336,
+            "sha256": "c0a51917c1e5a9dad4d8a49cdf47553e21fd47716d46e53c5f44fcc7bf7f3af1"
           }
         ],
         "when": {
           "node": "image-to-3d",
-          "setting": "model",
+          "setting": "quantization",
           "values": [
-            "trellis2-q4"
+            "f16"
           ]
         }
       },
@@ -205,16 +236,16 @@
         "license": "LicenseRef-DINOv3-License",
         "files": [
           {
-            "path": "q4/dinov3.gguf",
-            "bytes": 172662976,
-            "sha256": "6473cf96fd275bf84f5cc0556975a2abaa10b641e4a07101dcad561df1917ef2"
+            "path": "dinov3.gguf",
+            "bytes": 606773440,
+            "sha256": "b2e84087aebeb06440da4f5970413153f7f27f71ede7bab993e82accd839d936"
           }
         ],
         "when": {
           "node": "image-to-3d",
-          "setting": "model",
+          "setting": "quantization",
           "values": [
-            "trellis2-q4"
+            "f16"
           ]
         }
       },
@@ -272,9 +303,9 @@
         ],
         "when": {
           "node": "image-to-3d",
-          "setting": "model",
+          "setting": "quantization",
           "values": [
-            "trellis2-q8"
+            "q8"
           ]
         }
       },
@@ -292,9 +323,9 @@
         ],
         "when": {
           "node": "image-to-3d",
-          "setting": "model",
+          "setting": "quantization",
           "values": [
-            "trellis2-q8"
+            "q8"
           ]
         }
       },
@@ -305,56 +336,76 @@
         "license": "MIT",
         "files": [
           {
-            "path": "birefnet.gguf",
+            "path": "q4/birefnet.gguf",
             "bytes": 882749024,
             "sha256": "10c5dd4dcac904cf81c9a16180eb66f167dd52ab55867f54a44567b0b2babbc1"
           },
           {
-            "path": "ss_dec.gguf",
+            "path": "q4/ss_dec.gguf",
             "bytes": 147379392,
             "sha256": "2790b5eecb261cc877d9bf175ce2bd6dd48cd65be8c042c5f5bc023dfca01cf7"
           },
           {
-            "path": "shape_dec.gguf",
-            "bytes": 948745344,
-            "sha256": "d3230b649031b55728da2d8818f092eab9ad6f1e72fd01f6cbff6bfada5d7d47"
+            "path": "q4/shape_dec.gguf",
+            "bytes": 845423552,
+            "sha256": "79a52ddfed3454f724683940c11cfbfcf76c427ab3b7fdeb4c3cfc6d26647de4"
           },
           {
-            "path": "tex_dec.gguf",
-            "bytes": 948713888,
-            "sha256": "858d1e0079254e1d1f0596d7fa3a747d21bfe80f83d810e735a1e0b9db550322"
+            "path": "q4/tex_dec.gguf",
+            "bytes": 845414272,
+            "sha256": "20b208e402db907c6800dd4ad486a0d6e927e4511a6ff87fb51049794988927b"
           },
           {
-            "path": "ss_flow.gguf",
-            "bytes": 2586488480,
-            "sha256": "1dfbef1b80ddea422a6189ff9ac29a244c4482cfbaa01870a0c0ea76d3fb9ae6"
+            "path": "q4/ss_flow.gguf",
+            "bytes": 730496672,
+            "sha256": "a43c6393ee4a763a03e382de750d4f62752bacf969940442fd856230e62b88c2"
           },
           {
-            "path": "shape_flow_512.gguf",
-            "bytes": 2586636032,
-            "sha256": "fef397f3600e2fab327a98b3edd3cc8377e9741eef870f3ea3f40235875828fb"
+            "path": "q4/shape_flow_512.gguf",
+            "bytes": 730520576,
+            "sha256": "de7b87a92280035258c94314258e3b8314de39e5f001eac1ada0b4087785fb63"
           },
           {
-            "path": "shape_flow_1024.gguf",
-            "bytes": 2586636032,
-            "sha256": "7d0e9903bf132a5d78f289eaa2fa4050bcd52c689716406cbf66b76cdfa4656c"
+            "path": "q4/shape_flow_1024.gguf",
+            "bytes": 730520576,
+            "sha256": "54e49e3408b9f77bdc85c3f5a400a58a1d9fc091e111986eda7caeaea621b305"
           },
           {
-            "path": "tex_flow_512.gguf",
-            "bytes": 2586734336,
-            "sha256": "0e81b8213191369dc023eb270650f0ccded29f39bf0bbb7a1fe5d4bcefc15b79"
+            "path": "q4/tex_flow_512.gguf",
+            "bytes": 730548224,
+            "sha256": "fff7bca6418ad607b8b9ff24034ff63f591d0a9b72f308960bffd6f5cd17390b"
           },
           {
-            "path": "tex_flow_1024.gguf",
-            "bytes": 2586734336,
-            "sha256": "c0a51917c1e5a9dad4d8a49cdf47553e21fd47716d46e53c5f44fcc7bf7f3af1"
+            "path": "q4/tex_flow_1024.gguf",
+            "bytes": 730548224,
+            "sha256": "028d3be82075f8a4d8b4bd08985e1215ac3783ed332dbf7e8fd6535fcdd3d5a8"
           }
         ],
         "when": {
           "node": "image-to-3d",
-          "setting": "model",
+          "setting": "quantization",
           "values": [
-            "trellis2-f16"
+            "q4"
+          ]
+        }
+      },
+      {
+        "source": "huggingface",
+        "repo": "ilintar/trellis2-gguf",
+        "revision": "a57397bd3d351599d9729fc144b3f87c3f87d65b",
+        "license": "LicenseRef-DINOv3-License",
+        "files": [
+          {
+            "path": "q4/dinov3.gguf",
+            "bytes": 172662976,
+            "sha256": "6473cf96fd275bf84f5cc0556975a2abaa10b641e4a07101dcad561df1917ef2"
+          }
+        ],
+        "when": {
+          "node": "image-to-3d",
+          "setting": "quantization",
+          "values": [
+            "q4"
           ]
         }
       },
@@ -374,7 +425,6 @@
           "node": "image-to-3d",
           "setting": "model",
           "values": [
-            "trellis2-f16",
             "pixal3d"
           ]
         }

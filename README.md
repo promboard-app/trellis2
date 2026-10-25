@@ -8,7 +8,7 @@ PromBoard 커뮤니티 플러그인입니다. 캔버스에 **TRELLIS.2 이미지
 
 ## 결과 예시
 
-모두 이 저장소의 `nodes/main.py` 를 PromBoard 앱(격리 실행)에서 그대로 돌린 결과입니다. 판 TRELLIS.2 · q4, 엔진 CUDA 13, 해상도 1024, 시드 42.
+모두 이 저장소의 `nodes/main.py` 를 PromBoard 앱(격리 실행)에서 그대로 돌린 결과입니다(1.0.0). 판 TRELLIS.2 · 경량화 GGUF Q4, 엔진 CUDA 13, 해상도 1024, 시드 42.
 
 ![화분 사진과 그 사진으로 만든 3D 모델의 앞 · 옆 모습](docs/plant.jpg)
 
@@ -21,19 +21,19 @@ PromBoard 커뮤니티 플러그인입니다. 캔버스에 **TRELLIS.2 이미지
 
 | 고르는 것 | 받는 크기 |
 |---|---|
-| 판 TRELLIS.2 · q4 (기본) | 6.5GB |
-| 판 TRELLIS.2 · q8 | 10.0GB |
-| 판 TRELLIS.2 · f16 | 16.5GB |
+| 경량화 GGUF Q4 (그래픽카드 메모리 16GB 미만의 자동) | 6.5GB |
+| 경량화 GGUF Q8 | 10.0GB |
+| 경량화 원본 (f16, 16GB 이상의 자동) | 16.5GB |
 | 판 Pixal3D · f16 | 14.5GB |
 | 엔진 NVIDIA (CUDA 13, 기본) | 0.7GB |
 | 엔진 NVIDIA (CUDA 12) | 0.6GB |
 | 엔진 AMD · 인텔 (Vulkan) | 14MB |
 
-고른 판 · 엔진만 받습니다. 가중치는 Hugging Face [ilintar/trellis2-gguf](https://huggingface.co/ilintar/trellis2-gguf) · [vegax87/Pixal3D](https://huggingface.co/vegax87/Pixal3D), 실행 파일은 [trellis.cpp v0.8.1 릴리스](https://github.com/pwilkin/trellis.cpp/releases/tag/v0.8.1)에서 sha256 을 확인하며 받습니다. 플러그인 zip 에는 들어 있지 않습니다.
+고른 판 · 엔진만 받습니다. 경량화 '자동'은 이 PC 그래픽카드 메모리가 16GB 이상이면 원본(f16), 그 밖에는 GGUF Q4 를 고릅니다(16GB 는 trellis.cpp 문서의 '1024 해상도가 16GB 카드에서 돈다'를 따른 값입니다). Pixal3D 는 f16 하나뿐이라 경량화를 보지 않지만, 실행할 때 고른 경량화 판의 TRELLIS.2 파일도 있어야 합니다(실행 준비가 처음 값으로 받아 둡니다). 가중치는 Hugging Face [ilintar/trellis2-gguf](https://huggingface.co/ilintar/trellis2-gguf) · [vegax87/Pixal3D](https://huggingface.co/vegax87/Pixal3D), 실행 파일은 [trellis.cpp v0.8.1 릴리스](https://github.com/pwilkin/trellis.cpp/releases/tag/v0.8.1)에서 sha256 을 확인하며 받습니다. 플러그인 zip 에는 들어 있지 않습니다.
 
 ## 그래픽카드 메모리 · 걸린 시간 (실측)
 
-RTX 4070 SUPER 12GB · Windows 11, 판 q4 · 엔진 CUDA 13 · 해상도 1024:
+RTX 4070 SUPER 12GB · Windows 11, 경량화 GGUF Q4 · 엔진 CUDA 13 · 해상도 1024:
 
 | 사진 | 그래픽카드 메모리 최대 | 걸린 시간 | GLB |
 |---|---|---|---|
@@ -42,7 +42,7 @@ RTX 4070 SUPER 12GB · Windows 11, 판 q4 · 엔진 CUDA 13 · 해상도 1024:
 
 - 시간은 디스크가 아주 바쁜 상태(다른 작업이 같은 하드디스크를 함께 쓰던 때)에서 잰 값입니다. 단계마다 가중치를 디스크에서 읽고, 마지막 GLB 쓰기(UV 펼치기 · 재질 굽기)가 CPU 로 3~4분 걸렸습니다. 보통 SSD 에서는 이보다 빠릅니다.
 - 처음 실행 때는 받은 실행 파일 묶음을 플러그인 캐시 폴더에 한 번 풉니다(CUDA 판 0.7GB).
-- **미검증**: q8 · f16 · Pixal3D 판, CUDA 12 · Vulkan 엔진, 해상도 512 · 1536. 12GB 그래픽카드에서 q4 만 돌려 보았습니다.
+- **미검증**: 경량화 GGUF Q8 · 원본(f16), Pixal3D 판, CUDA 12 · Vulkan 엔진, 해상도 512 · 1536. 12GB 그래픽카드에서 GGUF Q4 만 돌려 보았습니다. 1.1.0 은 1.0.0 에서 판 고르기를 '판(TRELLIS.2 · Pixal3D)'과 '경량화'로 나눈 것이라 다시 돌려 보지 않았습니다.
 
 ## 알아 둘 것
 
@@ -67,13 +67,13 @@ RTX 4070 SUPER 12GB · Windows 11, 판 q4 · 엔진 CUDA 13 · 해상도 1024:
 
 1. PromBoard → 플러그인 매니저 → **커뮤니티 플러그인** → 둘러보기에서 설치합니다.
 2. 코드가 든 플러그인이라 **제한 모드**를 끄고 플러그인을 켭니다.
-3. 처음 실행 전 실행 준비가 고른 판의 가중치와 실행 파일을 받습니다(기본 7.2GB).
+3. 처음 실행 전 실행 준비가 고른 판의 가중치와 실행 파일을 받습니다(그래픽카드 메모리 16GB 미만 7.2GB, 이상 17.2GB).
 4. 캔버스 빈 곳을 오른쪽 클릭하면 메뉴 맨 아래 플러그인 묶음에 **TRELLIS.2 이미지 → 3D** 가 있습니다.
 
 ## 플러그인 만드는 사람을 위한 메모
 
 ```
-manifest.json           플러그인 정보 · 노드(layout single, views orbit3d) · 판 · 엔진별 모델(requires.models[].when)
+manifest.json           플러그인 정보 · 노드(layout single, views orbit3d) · 경량화 · 판 · 엔진별 모델(requires.models[].when)
 nodes/main.py           NODES = {"image-to-3d": 함수} — zip 풀기(폴더 밖 항목 거절), trellis-cli 를 셸 없이 인자 목록으로 실행,
                         표준 출력의 [n/7] 단계 줄로 진행률, 취소하면 프로세스 종료, 메모리 부족 글 알아보기
 nodes/requirements-win.txt   파이썬 패키지 잠금 파일(Pillow 하나, torch 없음)
@@ -96,7 +96,7 @@ Left is the input photo, right is the result GLB drawn with three.js (GLTFLoader
 
 ### Examples
 
-All results come from running this repository's `nodes/main.py` inside the PromBoard app (isolated run). Model TRELLIS.2 · q4, engine CUDA 13, resolution 1024, seed 42.
+All results come from running this repository's `nodes/main.py` (1.0.0) inside the PromBoard app (isolated run). Model TRELLIS.2 · quantization GGUF Q4, engine CUDA 13, resolution 1024, seed 42.
 
 ![A potted plant photo with the front and side of the 3D model made from it](docs/plant.jpg)
 
@@ -109,19 +109,19 @@ All results come from running this repository's `nodes/main.py` inside the PromB
 
 | Choice | Size |
 |---|---|
-| Model TRELLIS.2 · q4 (default) | 6.5 GB |
-| Model TRELLIS.2 · q8 | 10.0 GB |
-| Model TRELLIS.2 · f16 | 16.5 GB |
+| Quantization GGUF Q4 (auto below 16 GB of GPU memory) | 6.5 GB |
+| Quantization GGUF Q8 | 10.0 GB |
+| Quantization original (f16, auto at 16 GB and above) | 16.5 GB |
 | Model Pixal3D · f16 | 14.5 GB |
 | Engine NVIDIA (CUDA 13, default) | 0.7 GB |
 | Engine NVIDIA (CUDA 12) | 0.6 GB |
 | Engine AMD · Intel (Vulkan) | 14 MB |
 
-Only the chosen model and engine are downloaded, pinned by sha256: weights from Hugging Face ([ilintar/trellis2-gguf](https://huggingface.co/ilintar/trellis2-gguf), [vegax87/Pixal3D](https://huggingface.co/vegax87/Pixal3D)) and the executables from the [trellis.cpp v0.8.1 release](https://github.com/pwilkin/trellis.cpp/releases/tag/v0.8.1). None of them are in the plugin zip.
+With quantization on auto (경량화 · 자동) the app picks the original f16 weights when the GPU has 16 GB or more and GGUF Q4 otherwise (16 GB follows the trellis.cpp docs: the 1024 cascade runs on a 16 GB card). Pixal3D has only f16 and ignores the quantization choice, but a run still needs the TRELLIS.2 files of the chosen quantization (prepare downloads them with the default). Only the chosen model and engine are downloaded, pinned by sha256: weights from Hugging Face ([ilintar/trellis2-gguf](https://huggingface.co/ilintar/trellis2-gguf), [vegax87/Pixal3D](https://huggingface.co/vegax87/Pixal3D)) and the executables from the [trellis.cpp v0.8.1 release](https://github.com/pwilkin/trellis.cpp/releases/tag/v0.8.1). None of them are in the plugin zip.
 
 ### GPU memory and time (measured)
 
-RTX 4070 SUPER 12 GB · Windows 11, q4 · CUDA 13 · resolution 1024: peak GPU memory 3.4 GB; 10 min 11 s for the plant (13.6 MB GLB) and 9 min 30 s for the bench (11.8 MB GLB, memory not recorded). Times were measured while other jobs were hammering the same hard disk: each stage reads its weights from disk, and the final GLB write (UV unwrap and texture bake on the CPU) took 3–4 minutes. A normal SSD is faster. The first run also unpacks the engine bundle into the plugin cache once (0.7 GB for CUDA). **Not verified**: q8, f16 and Pixal3D, the CUDA 12 and Vulkan engines, resolutions 512 and 1536 — only q4 was run, on a 12 GB card.
+RTX 4070 SUPER 12 GB · Windows 11, GGUF Q4 · CUDA 13 · resolution 1024: peak GPU memory 3.4 GB; 10 min 11 s for the plant (13.6 MB GLB) and 9 min 30 s for the bench (11.8 MB GLB, memory not recorded). Times were measured while other jobs were hammering the same hard disk: each stage reads its weights from disk, and the final GLB write (UV unwrap and texture bake on the CPU) took 3–4 minutes. A normal SSD is faster. The first run also unpacks the engine bundle into the plugin cache once (0.7 GB for CUDA). **Not verified**: GGUF Q8, original f16 and Pixal3D, the CUDA 12 and Vulkan engines, resolutions 512 and 1536 — only GGUF Q4 was run, on a 12 GB card. 1.1.0 only splits the 1.0.0 model choice into a model (TRELLIS.2 · Pixal3D) and a quantization setting and was not re-run.
 
 ### Notes
 
@@ -131,7 +131,7 @@ RTX 4070 SUPER 12 GB · Windows 11, q4 · CUDA 13 · resolution 1024: peak GPU m
 - Face count follows the trellis.cpp default (150K at resolution 512, 300K at 1024 and above, quadric simplification); trellis.cpp has no face-count option.
 - The GLB textures are WebP (`EXT_texture_webp`). PromBoard's 3D view and three.js read them; some 3D programs do not.
 - Turning off "재질 입히기" (texture) makes geometry only, faster.
-- **Install**: PromBoard → Plugin Manager → **Community plugins** → Browse → install, turn off **Restricted mode** and enable the plugin. The first prepare downloads the chosen model and engine (7.2 GB by default). Right-click an empty spot on the canvas: the node is in the plugin group at the bottom of the menu.
+- **Install**: PromBoard → Plugin Manager → **Community plugins** → Browse → install, turn off **Restricted mode** and enable the plugin. The first prepare downloads the chosen model and engine (7.2 GB below 16 GB of GPU memory, 17.2 GB at 16 GB and above). Right-click an empty spot on the canvas: the node is in the plugin group at the bottom of the menu.
 
 The plugin texts in the app are Korean only for now — the plugin manifest takes a single language.
 

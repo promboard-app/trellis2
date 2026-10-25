@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "promboard.trellis2",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "name": "TRELLIS.2 — 이미지 → 재질 입힌 3D",
   "description": "Microsoft TRELLIS.2(4B)로 물체 사진 한 장에서 PBR 재질(색 · 거칠기 · 금속성 · 투명도)이 입혀진 GLB 3D 모델을 만든다. 후속판 Pixal3D 도 고를 수 있다. 윈도우 전용 — trellis.cpp(C++ 실행 파일, MIT)를 GitHub 릴리스에서, GGUF 가중치를 Hugging Face 에서 받아 파이썬 · CUDA 컴파일 없이 돈다. NVIDIA 는 CUDA, AMD · 인텔은 Vulkan. 경량화(원본 f16 · GGUF Q8 · Q4)는 자동이면 그래픽카드 메모리로 고른다.",
   "author": "PromBoard",
@@ -60,7 +60,7 @@
         {
           "id": "quantization",
           "label": "경량화",
-          "help": "TRELLIS.2 가중치 판. 자동은 그래픽카드 메모리 16GB 이상이면 원본(f16), 그 밖에는 GGUF Q4 를 고릅니다. Q8 · Q4 는 더 가볍고 결과가 조금 덜 정확할 수 있습니다. 고른 판만 받습니다.",
+          "help": "가벼운 판일수록 그래픽카드 메모리를 덜 쓰고 받는 크기가 작아요. 품질은 조금 낮아질 수 있어요",
           "type": "select",
           "options": [
             {
